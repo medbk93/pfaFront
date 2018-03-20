@@ -1,0 +1,17 @@
+<mat-card>Disponibilitée des enseignants</mat-card>
+<form class="teacher-form">
+  <mat-form-field class="teacher-full-width">
+    <input type="text" name="listFilter" placeholder="Pick one" [(ngModel)]="listFilter" aria-label="Number" matInput  [matAutocomplete]="auto">
+    <mat-autocomplete [displayWith]="displayFn" (optionSelected)="loadUserData($event.option.value.id)" #auto="matAutocomplete">
+      <mat-option *ngFor="let teacher of filteredTeachers" [value]="teacher">
+        {{ teacher.nom }}
+      </mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+</form>
+<form class="teacher-information-form" *ngIf="teacher">
+  <app-prof-availability [teacher]="teacher"></app-prof-availability>
+</form>
+
+
+

@@ -1,0 +1,27 @@
+[
+  {
+    "id": 1,
+    "name": "s1",
+    "startTime": "8h30"
+  },
+  {
+    "id": 2,
+    "name": "s2",
+    "startTime": "11h"
+  },
+  {
+    "id": 3,
+    "name": "s3",
+    "startTime": "13h30"
+  },
+  {
+    "id": 4,
+    "name": "s5",
+    "startTime": "15h30"
+  },
+  {
+    "id": 5,
+    "name": "s5",
+    "startTime": "18h"
+  }
+]
