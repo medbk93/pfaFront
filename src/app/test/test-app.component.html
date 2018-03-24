@@ -1,16 +1,31 @@
 <mat-card>Disponibilitée des enseignants</mat-card>
 <form class="teacher-form">
-  <mat-form-field class="teacher-full-width">
-    <input type="text" name="listFilter" placeholder="Pick one" [(ngModel)]="listFilter" aria-label="Number" matInput  [matAutocomplete]="auto">
-    <mat-autocomplete [displayWith]="displayFn" (optionSelected)="loadUserData($event.option.value.id)" #auto="matAutocomplete">
-      <mat-option *ngFor="let teacher of filteredTeachers" [value]="teacher">
-        {{ teacher.nom }}
-      </mat-option>
-    </mat-autocomplete>
-  </mat-form-field>
+  <div>
+    <h3>Surveillants Non traités</h3>
+    <mat-form-field class="teacher-full-width">
+      <input type="text" name="listFilter" placeholder="Surveillants non traités" [(ngModel)]="listFilterUntreatedTeacher"
+             aria-label="Number" [formControl]="teacherSearch" matInput  [matAutocomplete]="auto">
+      <i class="material-icons clear" matSuffix aria-label="Clear" (click)="testClick()">clear</i>
+      <mat-autocomplete [displayWith]="displayFn" (optionSelected)="loadUserData($event.option.value.id)" #auto="matAutocomplete">
+        <mat-option (onSelectionChange)="test()" *ngFor="let teacher of filteredNoTreatedTeachers" [value]="teacher">
+          {{ teacher.nom }}
+        </mat-option>
+      </mat-autocomplete>
+    </mat-form-field>
+  </div>
+  <div class="done">
+    <h3>Surveillants traités</h3>
+    <input type="text" name="listFilter" placeholder="Cherchez un enseignant" [(ngModel)]="listFilterTreatedTeacher"
+           aria-label="Number" [formControl]="teacherSearch" matInput>
+    <mat-list role="list" style="height: 200px; overflow-y: auto;">
+      <mat-option *ngFor="let teacher of filteredTreatedTeachers" (click)="loadUserData(teacher.id)"> {{ teacher.nom }} </mat-option>
+    </mat-list>
+  </div>
+
+
 </form>
-<form class="teacher-information-form" *ngIf="teacher">
-  <app-prof-availability [teacher]="teacher"></app-prof-availability>
+<form class="teacher-information-form">
+  <app-prof-availability (saveAvailabilityExecuted)="onSavingAvailabilityClicked($event)" [teacher]="teacher"></app-prof-availability>
 </form>
 
 

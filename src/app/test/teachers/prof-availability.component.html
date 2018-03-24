@@ -1,70 +1,80 @@
 <mat-card class="teacher-information">
   <mat-card-header>
-    <mat-card-title>Informations</mat-card-title>
-    <!--<mat-card-subtitle>{{ teacher.name }}</mat-card-subtitle>-->
+    <mat-card-title><h3>Informations</h3></mat-card-title>
+    <mat-card-subtitle *ngIf="teacher">
+      <strong>{{ teacher.nom }}</strong>
+      <mat-checkbox [checked]="toggleAllChecked" (change)="toggleAll($event)">
+        Disponible toute la session
+      </mat-checkbox>
+    </mat-card-subtitle>
   </mat-card-header>
   <mat-card-content>
     <div class="example-container mat-elevation-z8">
       <mat-table #table [dataSource]="dataSource">
           <ng-container matColumnDef="date">
-            <mat-header-cell *matHeaderCellDef> Date </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef> <strong>DATE D'EPREUVE</strong> </mat-header-cell>
             <mat-cell *matCellDef="let chreneau">
-              {{chreneau.date}}
-              <!--<mat-checkbox (change)="$event ? rowToggle(chreneau.id - 1) : null"></mat-checkbox>-->
+              <mat-checkbox (change)="$event ? rowToggle(chreneau.id - 1, $event) : null">
+                {{chreneau.date | date: 'EEEE'}}
+              </mat-checkbox>
             </mat-cell>
           </ng-container>
 
           <ng-container matColumnDef="seance1">
-            <mat-header-cell *matHeaderCellDef> {{sessionsTable[0]}}  </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef> <strong>SEANCE 1</strong></mat-header-cell>
             <mat-cell *matCellDef="let chreneau">
-              <mat-checkbox (change)="push(chreneau.id - 1, 0)">
+              <mat-checkbox [checked]="fun(chreneau.id - 1, 0)" (change)="push(chreneau.id - 1, 0)">
                 {{sessionsTable[0]}}
               </mat-checkbox>
             </mat-cell>
           </ng-container>
           <ng-container matColumnDef="seance2">
-            <mat-header-cell *matHeaderCellDef> {{sessionsTable[1]}} </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef> <strong>SEANCE 2</strong> </mat-header-cell>
             <mat-cell *matCellDef="let chreneau;">
-              <mat-checkbox (change)="push(chreneau.id - 1, 1)">
+              <mat-checkbox [checked]="fun(chreneau.id - 1, 1)" (change)="push(chreneau.id - 1, 1)">
                 {{sessionsTable[1]}}
               </mat-checkbox>
             </mat-cell>
           </ng-container>
 
         <ng-container matColumnDef="seance3">
-          <mat-header-cell *matHeaderCellDef> {{sessionsTable[2]}} </mat-header-cell>
+          <mat-header-cell *matHeaderCellDef> <strong>SEANCE 3</strong> </mat-header-cell>
           <mat-cell *matCellDef="let chreneau;">
-            <mat-checkbox (change)="push(chreneau.id - 1, 2)">
+            <mat-checkbox [checked]="fun(chreneau.id - 1, 2)" (change)="push(chreneau.id - 1, 2)">
               {{sessionsTable[2]}}
             </mat-checkbox>
           </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="seance4">
-          <mat-header-cell *matHeaderCellDef> {{sessionsTable[3]}} </mat-header-cell>
+          <mat-header-cell *matHeaderCellDef> <strong>SEANCE 4</strong> </mat-header-cell>
           <mat-cell *matCellDef="let chreneau;">
-            <mat-checkbox (change)="push(chreneau.id - 1, 3)">
+            <mat-checkbox [checked]="fun(chreneau.id - 1, 3)" (change)="push(chreneau.id - 1, 3)">
               {{sessionsTable[3]}}
             </mat-checkbox>
           </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="seance5">
-          <mat-header-cell *matHeaderCellDef> {{sessionsTable[4]}} </mat-header-cell>
+          <mat-header-cell *matHeaderCellDef> <strong>SEANCE 5</strong> </mat-header-cell>
           <mat-cell *matCellDef="let chreneau;">
-            <mat-checkbox (change)="push(chreneau.id - 1, 4)">
+            <mat-checkbox [checked]="fun(chreneau.id - 1, 4)" (change)="push(chreneau.id - 1, 4)">
               {{sessionsTable[4]}}
             </mat-checkbox>
           </mat-cell>
         </ng-container>
 
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+
         <mat-row *matRowDef="let chreneau; columns: displayedColumns;"></mat-row>
+
       </mat-table>
+
     </div>
 
 
   </mat-card-content>
 </mat-card>
-<button mat-raised-button="" color="primary" style="float: right; margin-top: 40px" (click)="saveAvailability()">OK</button>
+<button mat-raised-button="" *ngIf="teacher" [disabled]="enableOrDisableButton" color="primary" style="float: right; margin-top: 40px" (click)="saveAvailability()">OK</button>
 
+<!-- notifySavingAvailaility with EventEmitter par exemple to refresh the parent component or take another actions -->

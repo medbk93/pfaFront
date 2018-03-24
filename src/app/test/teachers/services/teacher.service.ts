@@ -3,7 +3,6 @@ import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Observable} from 'rxjs/Observable';
 import {Teacher} from '../models/teacher';
 import 'rxjs/add/operator/map';
-import {RequestOptions, Headers} from '@angular/http';
 
 @Injectable()
 export class TeacherService {
@@ -14,6 +13,16 @@ export class TeacherService {
 
   getTeachers(): Observable<Teacher[]> {
     return this._http.get<Teacher[]>(this._teacherUrl).map(response => {
+      return response;
+    });
+  }
+  getTreatedTeachers(): Observable<Teacher[]> {
+    return this._http.get<Teacher[]>(this._teacherUrl + '/treated').map(response => {
+      return response;
+    });
+  }
+  getNoTreatedTeachers(): Observable<Teacher[]> {
+    return this._http.get<Teacher[]>(this._teacherUrl + '/noTreated').map(response => {
       return response;
     });
   }
@@ -32,5 +41,6 @@ export class TeacherService {
     };
     return this._http.post<Teacher>(this._teacherUrl + '/availability/new', JSON.stringify(data), httpOptions);
   }
+
 
 }

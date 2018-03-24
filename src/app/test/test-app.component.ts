@@ -1,7 +1,8 @@
-import {Component, EventEmitter, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
 import {Teacher} from './teachers/models/teacher';
 import {TeacherService} from './teachers/services/teacher.service';
 import {Router} from '@angular/router';
+import {FormControl} from '@angular/forms';
 
 @Component({
   selector: 'app-test-app',
@@ -11,35 +12,56 @@ import {Router} from '@angular/router';
 export class TestAppComponent implements OnInit {
 
   @Output() optionSelected = new EventEmitter();
-
-  teachers: Teacher[];
+  teacherSearch = new FormControl();
+  treatedTeachers: Teacher[];
+  untreatedTeachers: Teacher[];
   teacher: Teacher;
 
-  filteredTeachers: Teacher[];
+  filteredTreatedTeachers: Teacher[];
+  filteredNoTreatedTeachers: Teacher[];
 
-  _listFilter: string|Teacher;
-  get listFilter(): string|Teacher {
-    return this._listFilter;
+  _listFilterUntreatedTeacher: string|Teacher;
+  _listFilterTreatedTeacher: string|Teacher;
+  get listFilterUntreatedTeacher(): string|Teacher {
+    return this._listFilterUntreatedTeacher;
   }
-  set listFilter(value: string|Teacher) {
-    this._listFilter = value;
-    this.filteredTeachers = this.listFilter ?
-      this.filter(typeof this.listFilter === 'object' ? this.listFilter.nom : this.listFilter) : this.teachers;
+  set listFilterUntreatedTeacher(value: string|Teacher) {
+    this._listFilterUntreatedTeacher = value;
+    this.filteredNoTreatedTeachers = this.listFilterUntreatedTeacher ?
+      this.filter(typeof this.listFilterUntreatedTeacher === 'object' ? this.listFilterUntreatedTeacher.nom : this.listFilterUntreatedTeacher, this.untreatedTeachers) : this.untreatedTeachers;
+  }
+  get listFilterTreatedTeacher(): string|Teacher {
+    return this._listFilterTreatedTeacher;
+  }
+  set listFilterTreatedTeacher(value: string|Teacher) {
+    this._listFilterTreatedTeacher = value;
+    this.filteredTreatedTeachers = this.listFilterTreatedTeacher ?
+      this.filter(typeof this.listFilterTreatedTeacher === 'object' ? this.listFilterTreatedTeacher.nom : this.listFilterTreatedTeacher, this.treatedTeachers) : this.treatedTeachers;
   }
 
   constructor (private teacherService: TeacherService, private router: Router) {}
 
   ngOnInit() {
-    this.teacherService.getTeachers().subscribe(data => {
-      this.teachers = data;
-      this.filteredTeachers = data;
-      console.log(this.teachers);
+    this.teacherService.getNoTreatedTeachers().subscribe(data => {
+      this.untreatedTeachers = data;
+      this.filteredNoTreatedTeachers = data;
+    });
+    this.teacherService.getTreatedTeachers().subscribe(data => {
+      this.treatedTeachers = data;
+      this.filteredTreatedTeachers = data;
     });
   }
+  testClick() {
+    this.teacherSearch.setValue('');
+  }
 
-  filter(filterBy: string): Teacher[] {
+  test() {
+    console.log('test');
+  }
+
+  filter(filterBy: string,  targetTeachers: Teacher[]): Teacher[] {
     filterBy = filterBy.toLocaleLowerCase();
-    return this.teachers.filter((teacher: Teacher) =>
+    return targetTeachers.filter((teacher: Teacher) =>
       teacher.nom.toLocaleLowerCase().indexOf(filterBy) !== -1);
   }
 
@@ -52,6 +74,10 @@ export class TestAppComponent implements OnInit {
 
   displayFn(teacher?: Teacher): string | undefined {
     return teacher ? teacher.nom : undefined;
+  }
+
+  onSavingAvailabilityClicked(value: boolean) {
+    this.ngOnInit();
   }
 
 }
