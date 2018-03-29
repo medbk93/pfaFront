@@ -10,6 +10,10 @@ import {TeacherService} from './teachers/services/teacher.service';
 import {HttpClientModule} from '@angular/common/http';
 import {ChreneauService} from './teachers/services/chreneau.service';
 import {SessionService} from './teachers/services/session.service';
+import { TestsComponent } from './tests/tests.component';
+import {TestService} from './tests/services/test.service';
+import {MatSortModule} from '@angular/material';
+import {LocalService} from './tests/services/local.service';
 
 @NgModule({
   imports: [
@@ -19,12 +23,13 @@ import {SessionService} from './teachers/services/session.service';
     FormsModule,
     ReactiveFormsModule,
     FlexLayoutModule,
-    HttpClientModule
+    HttpClientModule,
+    MatSortModule
   ],
   exports: [
     CommonModule,
   ],
-  providers: [TeacherService, ChreneauService, SessionService],
-  declarations: [ProfAvailabilityComponent, TestAppComponent]
+  providers: [TeacherService, ChreneauService, SessionService, TestService, LocalService],
+  declarations: [ProfAvailabilityComponent, TestAppComponent, TestsComponent]
 })
 export class TestAppModule { }

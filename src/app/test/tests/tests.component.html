@@ -1,0 +1,101 @@
+<div class="example-container mat-elevation-z8">
+  <div class="example-header">
+    <mat-form-field>
+      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Chercher Par Epreuve, classe, date...">
+    </mat-form-field>
+  </div>
+  <mat-table #table [dataSource]="dataSource">
+
+
+    <!-- Position Column -->
+    <ng-container matColumnDef="tests.creneau.seance.heureDebut">
+      <mat-header-cell *matHeaderCellDef> <strong>HEURE DEBUT</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let test"> {{test.creneau.seance.heureDebut}} </mat-cell>
+    </ng-container>
+
+    &nbsp;&nbsp;
+    <!-- Name Column -->
+    <ng-container matColumnDef="tests.creneau.date">
+      <mat-header-cell
+        *matHeaderCellDef class="header-mat-table"
+        [style.color]="sortBy === 'creneau' ? 'red' : null"
+        (click)="test('creneau')">
+        <strong>DATE</strong>
+      </mat-header-cell>
+      <mat-cell *matCellDef="let test"> {{test.creneau.date | date: 'EEEE'}} </mat-cell>
+    </ng-container>
+
+    <!-- Weight Column -->
+    <ng-container matColumnDef="tests.nom">
+      <mat-header-cell *matHeaderCellDef> <strong>EPREUVE</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let test"> {{test.nom}} </mat-cell>
+    </ng-container>
+    <!-- Symbol Column -->
+    <ng-container matColumnDef="tests.duree">
+      <mat-header-cell *matHeaderCellDef> <strong>DUREE</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let test"> {{test.duree}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="tests.groupe.classe.nom">
+      <mat-header-cell
+        *matHeaderCellDef class="header-mat-table"
+        [style.color]="sortBy === 'classe' ? 'red' : null"
+        (click)="test('classe')">
+        <strong>CLASSE</strong>
+      </mat-header-cell>
+      <mat-cell *matCellDef="let test"> {{test.groupe.classe.nom}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="tests.groupe.nom">
+      <mat-header-cell *matHeaderCellDef> <strong>GROUPE</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let test"> {{test.groupe.nom}} </mat-cell>
+    </ng-container>
+    &nbsp;
+    <ng-container matColumnDef="tests.groupe.capacite">
+      <mat-header-cell *matHeaderCellDef> <strong>CAPACITE</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let test"> &nbsp; {{test.groupe.capacite}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="tests.local.nom">
+      <mat-header-cell *matHeaderCellDef> <strong>LOCALE</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let test">
+      <mat-form-field style="width: 75%">
+        <input type="text" placeholder="{{test.local?.nom}}" aria-label="Number"
+               matInput [matAutocomplete]="auto" [formControl]="searchLocal">
+        <i *ngIf="newLocalIsSelected" class="material-icons clear"
+           style="font-size: 12px" matSuffix aria-label="Clear" (click)="clearInput()">clear</i>
+        <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
+          <mat-option *ngFor="let local of filteredLocal | async" [value]="local"  (onSelectionChange)="localSelection(test, local)">
+            {{ local.nom }}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+      </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="tests.local.capacite">
+      <mat-header-cell *matHeaderCellDef> <strong>CAPACITE</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let test"> {{test.local?.capacite}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="tests.local.etage">
+      <mat-header-cell *matHeaderCellDef> <strong>ETAGE</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let test"> {{test.local?.etage}} </mat-cell>
+    </ng-container>
+
+
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+  <mat-paginator #paginator
+                 [pageSize]="10"
+                 [pageSizeOptions]="[5, 10, 20]"
+                 [showFirstLastButtons]="true">
+  </mat-paginator>
+</div>
+<mat-menu #menu="matMenu">
+  <button mat-menu-item>Salle 3</button>
+  <button mat-menu-item>Salle 4</button>
+</mat-menu>
+
