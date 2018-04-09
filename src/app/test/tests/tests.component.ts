@@ -1,13 +1,19 @@
-import {AfterViewInit, ChangeDetectorRef, Component, OnChanges, OnInit, SimpleChanges, ViewChild} from '@angular/core';
-import {MatSort, MatTableDataSource, MatPaginator, Sort} from '@angular/material';
+import {
+  ChangeDetectorRef, Component, OnInit,
+  ViewChild
+} from '@angular/core';
+import {
+  MatTableDataSource, MatPaginator, MatCheckbox, MatSnackBar
+} from '@angular/material';
 import {TestService} from './services/test.service';
 import {Test} from './models/test';
 import {Locale} from './models/locale';
-import {LocalService} from "./services/local.service";
-import {FormControl} from "@angular/forms";
+import {LocalService} from './services/local.service';
+import {FormControl} from '@angular/forms';
 import {startWith} from 'rxjs/operators/startWith';
 import {map} from 'rxjs/operators/map';
-import {Observable} from "rxjs/Observable";
+import {Observable} from 'rxjs/Observable';
+import {SelectionModel} from '@angular/cdk/collections';
 
 @Component({
   selector: 'app-tests',
@@ -17,20 +23,25 @@ import {Observable} from "rxjs/Observable";
 export class TestsComponent implements OnInit {
 
   displayedColumns = [
-    'tests.creneau.seance.heureDebut', 'tests.creneau.date',
+    'select', 'tests.creneau.date', 'tests.creneau.seance.heureDebut',
     'tests.nom', 'tests.duree', 'tests.groupe.classe.nom',
     'tests.groupe.nom', 'tests.groupe.capacite',
-    'tests.local.nom', 'tests.local.capacite', 'tests.local.etage'];
-  dataSource: MatTableDataSource<any>;
+    'tests.local.nom', 'tests.local.capacite', 'tests.local.etage', 'permuter'];
+  dataSource: MatTableDataSource<Test>;
   locaux: Locale[];
+  selectionTests: Test[] = [];
+  updatedTests: Test[] = [];
+  @ViewChild(MatCheckbox) selectedTest: MatCheckbox;
   searchLocal = new FormControl();
   newLocalIsSelected = false;
+  selection = new SelectionModel<Test>(true, []);
   sortBy = 'classe';
   tests: Test[];
   filteredLocal: Observable<Locale[]>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   constructor(private _test: TestService,
               private _local: LocalService,
+              private snackBar: MatSnackBar,
               private changeDetectorRefs: ChangeDetectorRef) {}
   ngOnInit() {
     this._local.getAllLocaux().subscribe(local => {
@@ -43,6 +54,10 @@ export class TestsComponent implements OnInit {
         );
     });
     this.refresh();
+  }
+  test(sortedBy: string): void {
+    this.sortBy = sortedBy;
+    this.ngOnInit();
   }
   displayFn(local?: Locale): string | undefined {
     return local ? local.nom : undefined;
@@ -59,12 +74,57 @@ export class TestsComponent implements OnInit {
       this.changeDetectorRefs.detectChanges();
     });
   }
-
+  processUpdatingTests(): void {
+    this._test.updateTests(this.updatedTests).subscribe(data => {
+      this.snackBar.open('Les permutations ont bien été procéder', 'succées', {
+        duration: 2000,
+      });
+    });
+  }
+  pushSelectedTest(test: Test): void {
+    this.selection.toggle(test);
+    if (this.selectionTests.length === 0) {
+      this.selectionTests.push(test);
+    } else {
+      const index = this.selectionTests.indexOf(test);
+      // the test already exist, process remove
+      if (index !== -1) {
+        this.selectionTests.splice(index, 1);
+      } else {
+        this.selectionTests.push(test);
+      }
+    }
+  }
+  enablePermute(test: Test): boolean {
+    let disabled = true;
+    if (this.selectionTests.length === 2) {
+      this.selectionTests.find(t => {
+        if (t.id === test.id) {
+          disabled = false;
+          return disabled;
+        }
+      });
+    }
+    return disabled;
+  }
+  executePermute() {
+    if (this.selectionTests.length === 2) {
+      const firstLocal = this.selectionTests[0].local;
+      this.selectionTests[0].local = this.selectionTests[1].local;
+      this.selectionTests[1].local = firstLocal;
+      this.selectionTests.forEach(t => {
+        this.updatedTests.push(t);
+      });
+      this.selectionTests = [];
+    }
+    this.selection = new SelectionModel<Test>(true, []);
+  }
   localSelection(test: Test, local: Locale) {
     this.newLocalIsSelected = true;
     test.local.nom = local.nom;
     test.local.capacite = local.capacite;
     test.local.etage = local.etage;
+    // this.clearInput();
   }
   filter(filterBy: string): Locale[] {
     return this.locaux.filter(local =>

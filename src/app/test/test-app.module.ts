@@ -10,7 +10,7 @@ import {TeacherService} from './teachers/services/teacher.service';
 import {HttpClientModule} from '@angular/common/http';
 import {ChreneauService} from './teachers/services/chreneau.service';
 import {SessionService} from './teachers/services/session.service';
-import { TestsComponent } from './tests/tests.component';
+import {TestsComponent} from './tests/tests.component';
 import {TestService} from './tests/services/test.service';
 import {MatSortModule} from '@angular/material';
 import {LocalService} from './tests/services/local.service';

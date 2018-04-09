@@ -1,3 +1,5 @@
+<button mat-raised-button style="margin-left: 84%;"
+        (click)="processUpdatingTests()" [disabled]="(selectionTests.length) < 2" color="primary">valider les modifications</button>
 <div class="example-container mat-elevation-z8">
   <div class="example-header">
     <mat-form-field>
@@ -6,14 +8,16 @@
   </div>
   <mat-table #table [dataSource]="dataSource">
 
-
-    <!-- Position Column -->
-    <ng-container matColumnDef="tests.creneau.seance.heureDebut">
-      <mat-header-cell *matHeaderCellDef> <strong>HEURE DEBUT</strong> </mat-header-cell>
-      <mat-cell *matCellDef="let test"> {{test.creneau.seance.heureDebut}} </mat-cell>
+    <!-- Checkbox Column -->
+    <ng-container matColumnDef="select">
+      <mat-header-cell *matHeaderCellDef>
+      </mat-header-cell>
+      <mat-cell style="overflow: visible;" *matCellDef="let test">
+        <mat-checkbox #SelectedTest (click)="$event.stopPropagation()"
+                      (change)="$event ? pushSelectedTest(test) : null"
+                      [checked]="selection.isSelected(test)"> </mat-checkbox>
+      </mat-cell>
     </ng-container>
-
-    &nbsp;&nbsp;
     <!-- Name Column -->
     <ng-container matColumnDef="tests.creneau.date">
       <mat-header-cell
@@ -23,6 +27,10 @@
         <strong>DATE</strong>
       </mat-header-cell>
       <mat-cell *matCellDef="let test"> {{test.creneau.date | date: 'EEEE'}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="tests.creneau.seance.heureDebut">
+      <mat-header-cell *matHeaderCellDef> <strong>HEURE DEBUT</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let test"> {{test.creneau.seance.heureDebut}} </mat-cell>
     </ng-container>
 
     <!-- Weight Column -->
@@ -61,7 +69,7 @@
       <mat-cell *matCellDef="let test">
       <mat-form-field style="width: 75%">
         <input type="text" placeholder="{{test.local?.nom}}" aria-label="Number"
-               matInput [matAutocomplete]="auto" [formControl]="searchLocal">
+               matInput [matAutocomplete]="auto" [value]="test.local?.nom" [formControl]="searchLocal">
         <i *ngIf="newLocalIsSelected" class="material-icons clear"
            style="font-size: 12px" matSuffix aria-label="Clear" (click)="clearInput()">clear</i>
         <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
@@ -83,6 +91,13 @@
       <mat-cell *matCellDef="let test"> {{test.local?.etage}} </mat-cell>
     </ng-container>
 
+    <ng-container matColumnDef="permuter">
+      <mat-header-cell *matHeaderCellDef> </mat-header-cell>
+      <mat-cell *matCellDef="let test">
+        <button mat-button color="accent" [disabled]="enablePermute(test)" (click)="executePermute()">Permuter</button>
+      </mat-cell>
+    </ng-container>
+
 
 
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
@@ -94,8 +109,4 @@
                  [showFirstLastButtons]="true">
   </mat-paginator>
 </div>
-<mat-menu #menu="matMenu">
-  <button mat-menu-item>Salle 3</button>
-  <button mat-menu-item>Salle 4</button>
-</mat-menu>
 
