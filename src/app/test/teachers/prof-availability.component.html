@@ -15,7 +15,7 @@
             <mat-header-cell *matHeaderCellDef> <strong>DATE D'EPREUVE</strong> </mat-header-cell>
             <mat-cell *matCellDef="let chreneau">
               <mat-checkbox (change)="$event ? rowToggle(chreneau.id - 1, $event) : null">
-                {{chreneau.date | date: 'EEEE'}}
+                {{chreneau.date | date: 'EEE dd/MMM'}}
               </mat-checkbox>
             </mat-cell>
           </ng-container>
@@ -36,33 +36,42 @@
               </mat-checkbox>
             </mat-cell>
           </ng-container>
+        <div>
+          <ng-container matColumnDef="seance3">
+            <mat-header-cell *matHeaderCellDef> <strong>SEANCE 3</strong> </mat-header-cell>
+            <mat-cell *matCellDef="let chreneau;">
+              <mat-checkbox
+                [disabled]="matrix[chreneau.id - 1][2] === undefined"
+                [checked]="fun(chreneau.id - 1, 2)"
+                (change)="push(chreneau.id - 1, 2)">
+                {{sessionsTable[2]}}
+              </mat-checkbox>
+            </mat-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="seance3">
-          <mat-header-cell *matHeaderCellDef> <strong>SEANCE 3</strong> </mat-header-cell>
-          <mat-cell *matCellDef="let chreneau;">
-            <mat-checkbox [checked]="fun(chreneau.id - 1, 2)" (change)="push(chreneau.id - 1, 2)">
-              {{sessionsTable[2]}}
-            </mat-checkbox>
-          </mat-cell>
-        </ng-container>
+          <ng-container matColumnDef="seance4">
+            <mat-header-cell *matHeaderCellDef> <strong>SEANCE 4</strong> </mat-header-cell>
+            <mat-cell *matCellDef="let chreneau;">
+              <mat-checkbox
+                [disabled]="matrix[chreneau.id - 1][3] === undefined"
+                [checked]="fun(chreneau.id - 1, 3)"
+                (change)="push(chreneau.id - 1, 3)">
+                {{sessionsTable[3]}}
+              </mat-checkbox>
+            </mat-cell>
+          </ng-container>
 
-        <ng-container matColumnDef="seance4">
-          <mat-header-cell *matHeaderCellDef> <strong>SEANCE 4</strong> </mat-header-cell>
-          <mat-cell *matCellDef="let chreneau;">
-            <mat-checkbox [checked]="fun(chreneau.id - 1, 3)" (change)="push(chreneau.id - 1, 3)">
-              {{sessionsTable[3]}}
-            </mat-checkbox>
-          </mat-cell>
-        </ng-container>
-
-        <ng-container matColumnDef="seance5">
-          <mat-header-cell *matHeaderCellDef> <strong>SEANCE 5</strong> </mat-header-cell>
-          <mat-cell *matCellDef="let chreneau;">
-            <mat-checkbox [checked]="fun(chreneau.id - 1, 4)" (change)="push(chreneau.id - 1, 4)">
-              {{sessionsTable[4]}}
-            </mat-checkbox>
-          </mat-cell>
-        </ng-container>
+          <ng-container matColumnDef="seance5">
+            <mat-header-cell *matHeaderCellDef> <strong>SEANCE 5</strong> </mat-header-cell>
+            <mat-cell *matCellDef="let chreneau;">
+              <mat-checkbox [disabled]="matrix[chreneau.id - 1][2] === undefined"
+                            [checked]="fun(chreneau.id - 1, 4)"
+                            (change)="push(chreneau.id - 1, 4)">
+                {{sessionsTable[4]}}
+              </mat-checkbox>
+            </mat-cell>
+          </ng-container>
+        </div>
 
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
 

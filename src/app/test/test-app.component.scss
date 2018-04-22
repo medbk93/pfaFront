@@ -21,3 +21,12 @@
 .clear:hover {
   cursor: pointer;
 }
+.dashboard {
+  margin-right:2%;
+  float: left;
+  width: 40%;
+  height: calc(100% - 70px);
+}
+.clearfix {
+  clear:both;
+}

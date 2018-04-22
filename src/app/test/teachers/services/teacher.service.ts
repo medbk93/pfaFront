@@ -27,12 +27,24 @@ export class TeacherService {
     });
   }
 
+  getPermanentTeachers(): Observable<Teacher[]> {
+    return this._http.get<Teacher[]>(this._teacherUrl + '/permanents').map(response => {
+      return response;
+    });
+  }
+
+  getVacataireTeachers(): Observable<Teacher[]> {
+    return this._http.get<Teacher[]>(this._teacherUrl + '/vacataire').map(response => {
+      return response;
+    });
+  }
+
   getTeacher(id: number): Observable<Teacher> {
     return this.getTeachers()
       .map((teachers: Teacher[]) => teachers.find(t => t.id === id));
   }
 
-  saveTeacherAvailability(teacher: Teacher, ids: number[]) {
+  saveTeacherAvailability(teacher: Teacher, ids: number[]): Observable<Teacher> {
     const data = {surveillant: teacher, ids: ids};
     const httpOptions = {
       headers: new HttpHeaders({

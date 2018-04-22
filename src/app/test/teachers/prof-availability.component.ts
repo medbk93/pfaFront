@@ -20,7 +20,7 @@ import {TeacherService} from './services/teacher.service';
 export class ProfAvailabilityComponent implements OnInit, OnChanges {
   @Input() teacher: Teacher;
   chreneaux: Chrenau[];
-  sessionsTable: any = ['s1', 's2', 's3', 's4', 's5'];
+  sessionsTable: any = ['S1', 'S2', 'S3', 'S4', 'S5'];
   matrix: number[][] = [];
   displayedColumns = ['date', 'seance1', 'seance2', 'seance3', 'seance4', 'seance5'];
   dataSource: MatTableDataSource<any>;
@@ -28,8 +28,7 @@ export class ProfAvailabilityComponent implements OnInit, OnChanges {
   lengthOfArrayIds = 0;
   enableOrDisableButton = true;
   toggleAllChecked = false;
-  @Output() saveAvailabilityExecuted: EventEmitter<boolean> = new EventEmitter();
-  selection = new SelectionModel<Chrenau>(true, []);
+  @Output() saveAvailabilityExecuted: EventEmitter<Teacher> = new EventEmitter();
   constructor(private _chreneau: ChreneauService,
               private _teacher: TeacherService,
               private snackBar: MatSnackBar) { }
@@ -59,35 +58,45 @@ export class ProfAvailabilityComponent implements OnInit, OnChanges {
 
 
   }
-  //
-  // clearMatrix() {
-  //   for (let i = 0; i < this.chreneaux.length; i++) {
-  //     this.matrix[i] = [];
-  //     for (let j = 0; j <= 5; j++) {
-  //       this.matrix[i][j] = 0;
-  //     }
-  //   }
-  // }
   // showMatrix() {
   //   for (let i = 0; i < this.chreneaux.length; i++) {
+  //     console.log('i' + i);
   //     for (let j = 0; j <= 5; j++) {
+  //       console.log('j ' + j);
   //       console.log(this.matrix[i][j]);
   //     }
   //   }
   // }
   instanciateMatrix() {
+    const index = this.chreneaux.findIndex(c => {
+      return new Date(c.date).getDay() === 6;
+    });
     for (let i = 0; i <= this.chreneaux.length; i++) {
       this.matrix[i] = [];
-      for (let j = 0; j < 5; j++) {
+      if (this.chreneaux[i] === this.chreneaux[index]) {
+        for (let j = 0; j < 2; j++) {
           this.matrix[i][j] = 0;
+        }
+      } else {
+        for (let j = 0; j < 5; j++) {
+          this.matrix[i][j] = 0;
+        }
       }
     }
     if (this.teacher != null) {
-      this.insertCreneauxIfExist();
+      this.insertCreneauxIfExist(this.teacher.creneaux);
     }
   }
-  insertCreneauxIfExist() {
-    if (this.teacher.creneaux.length !== 0) {
+  getSaturdayId(cr: Chrenau[]): number {
+    const index = cr.findIndex(c => new Date(c.date).getDay() === 6);
+    return index;
+  }
+  insertCreneauxIfExist(creneaux: Chrenau[]) {
+    const index = this.getSaturdayId(this.chreneaux);
+    if (creneaux.length !== 0) {
+      this.teacherCrIds.sort((a, b) => a - b);
+      let flag = false;
+      console.log(this.teacherCrIds);
       this.teacherCrIds.forEach(id => {
         let first;
         let second;
@@ -97,6 +106,29 @@ export class ProfAvailabilityComponent implements OnInit, OnChanges {
         } else {
           first = Math.floor(id / 5);
           second = Math.floor(id % 5) - 1;
+        }
+        // currently in saturday
+        if (this.matrix[first][second] === undefined) {
+          first = first + 1;
+          second = (second + 3) - 5;
+          flag = true;
+        } else {
+          // test about i is greater than the i of saturday
+          if (this.matrix[first][second] === 1) {
+            second = second + 3;
+            if (second >= 5) {
+              first++;
+              second = second - 5;
+            }
+          } else {
+            if (first > index) {
+              second = second + 3;
+              if (second >= 5) {
+                first++;
+                second = second - 5;
+              }
+            }
+          }
         }
         this.matrix[first][second] = 1;
       });
@@ -122,36 +154,41 @@ export class ProfAvailabilityComponent implements OnInit, OnChanges {
 
   saveAvailability() {
     const data = [];
+    const index = this.chreneaux.findIndex(c => {
+      return new Date(c.date).getDay() === 6;
+    });
+    let flag = false;
     for (let i = 0; i <= this.chreneaux.length; i++) {
-      for (let j = 0; j < 5; j++) {
-        if (this.matrix[i][j] === 1) {
-          const id = i * 5 + (j + 1);
-          data.push(id);
+        for (let j = 0; j < 5; j++) {
+          if (this.matrix[i][j] === 1) {
+            let id;
+            if (flag) {
+              id = (i * 5 + (j + 1)) - 3;
+            } else {
+              id = i * 5 + (j + 1);
+            }
+            data.push(id);
+          }
         }
+      if (flag === false) {
+        flag = this.chreneaux[i] === this.chreneaux[index];
       }
+      console.log(data);
     }
-    this.teacher.creneaux = null;
-    this.teacher.epreuves = [];
-    this.teacher.type = null;
-    this._teacher.saveTeacherAvailability(this.teacher, data).subscribe(t => {
+
+    this._teacher.saveTeacherAvailability(this.teacher, data).subscribe(teacher => {
       this.snackBar.open('Disponibilté à bien été procéder', 'succées', {
         duration: 2000,
       });
+      this.saveAvailabilityExecuted.emit(teacher);
     });
-    this.saveAvailabilityExecuted.emit(true);
   }
-  // isAllSelected() {
-  //   const numSelected = this.selection.selected.length;
-  //   const numRows = this.dataSource.data.length;
-  //   console.log(numSelected, numRows);
-  //   return numSelected === numRows;
-  // }
-
   /** Selects all rows if they are not all selected; otherwise clear selection. */
   rowToggle(id: number, event) {
-    console.log(event);
-    console.log(id);
     for (let i = 0; i < 5; i++) {
+      if (this.matrix[id][i] === undefined) {
+        return;
+      }
       if (event.checked === true) {
         this.matrix[id][i] = 1;
         this.lengthOfArrayIds++;
@@ -165,14 +202,17 @@ export class ProfAvailabilityComponent implements OnInit, OnChanges {
   toggleAll(event): void {
     for (let i = 0; i <= this.chreneaux.length; i++) {
       for (let j = 0; j < 5; j++) {
-        if ( event.checked === true) {
-          this.matrix[i][j] = 1;
-          this.lengthOfArrayIds++;
-          this.toggleAllChecked = true;
+        if (this.matrix[i][j] === undefined) {
         } else {
-          this.matrix[i][j] = 0;
-          this.lengthOfArrayIds--;
-          this.toggleAllChecked = false;
+          if (event.checked === true) {
+            this.matrix[i][j] = 1;
+            this.lengthOfArrayIds++;
+            this.toggleAllChecked = true;
+          } else {
+            this.matrix[i][j] = 0;
+            this.lengthOfArrayIds--;
+            this.toggleAllChecked = false;
+          }
         }
       }
     }
@@ -180,3 +220,12 @@ export class ProfAvailabilityComponent implements OnInit, OnChanges {
   }
 
 }
+// function sortIds(a: number, b: number) {
+//   if (a < b) {
+//     return 1;
+//   } else if (a === b) {
+//     return 0;
+//   } else {
+//     return -1;
+//   }
+// }

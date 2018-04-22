@@ -1,13 +1,51 @@
-<mat-card>Disponibilitée des enseignants</mat-card>
+<!--make dashboar a child component reusable-->
+<div>
+  <mat-card class="dashboard">
+    <h5 style="color: grey">Surveillants Permanents</h5>
+    <mat-grid-list cols="3" rowHeight="2:1">
+      <!--<p style="display: inline">title</p>-->
+      <mat-grid-tile>
+
+        <mat-card [style.background-color]=
+                    "permanentTeachers?.length === permanentTreatedTeacher?.length
+                        ? 'green' : 'rgba(244, 67, 54, 0.78)'">
+          Total: {{permanentTeachers?.length}}</mat-card>
+      </mat-grid-tile>
+      <mat-grid-tile><mat-card>Traité: {{permanentTreatedTeacher?.length}}</mat-card></mat-grid-tile>
+      <mat-grid-tile><mat-card>Non Traité: {{permanentUntreatedTeacher?.length}}</mat-card></mat-grid-tile>
+    </mat-grid-list>
+  </mat-card>
+</div>
+<div>
+  <mat-card class="dashboard">
+    <h5 style="color: grey">Surveillants Vacataire</h5>
+    <mat-grid-list cols="3" rowHeight="2:1">
+      <!--<p style="display: inline">title</p>-->
+      <mat-grid-tile>
+        <mat-card [style.background-color]="vacataireTeachers?.length
+        === vacataireTreatedTeacher?.length ? 'green' : 'rgba(244, 67, 54, 0.78)'">
+          Total: {{vacataireTeachers?.length}}</mat-card>
+      </mat-grid-tile>
+      <mat-grid-tile><mat-card>Traité: {{ vacataireTreatedTeacher?.length }}</mat-card></mat-grid-tile>
+      <mat-grid-tile><mat-card>Non Traité: {{ vacataireUntreatedTeacher?.length }}</mat-card></mat-grid-tile>
+    </mat-grid-list>
+  </mat-card>
+</div>
+<div class="clearfix"></div>
 <form class="teacher-form">
   <div>
     <h3>Surveillants Non traités</h3>
-    <mat-form-field class="teacher-full-width">
+    <mat-radio-group name="type" [(ngModel)]="teacherType">
+      <mat-radio-button value="permanent">Permanent</mat-radio-button>
+      <mat-radio-button value="vacataire">Vacataire</mat-radio-button>
+    </mat-radio-group>
+
+    <mat-form-field class="teacher-full-width" style="margin-top: 5%">
       <input type="text" name="listFilter" placeholder="Surveillants non traités" [(ngModel)]="listFilterUntreatedTeacher"
              aria-label="Number" [formControl]="teacherSearch" matInput  [matAutocomplete]="auto">
       <i class="material-icons clear" matSuffix aria-label="Clear" (click)="testClick()">clear</i>
       <mat-autocomplete [displayWith]="displayFn" (optionSelected)="loadUserData($event.option.value.id)" #auto="matAutocomplete">
-        <mat-option (onSelectionChange)="test()" *ngFor="let teacher of filteredNoTreatedTeachers" [value]="teacher">
+        <mat-option (onSelectionChange)="test(teacher)" *ngFor="let teacher of filteredNoTreatedTeachers" [value]="teacher">
           {{ teacher.nom }}
         </mat-option>
       </mat-autocomplete>
@@ -17,7 +55,7 @@
     <h3>Surveillants traités</h3>
     <input type="text" name="listFilter" placeholder="Cherchez un enseignant" [(ngModel)]="listFilterTreatedTeacher"
            aria-label="Number" [formControl]="teacherSearch" matInput>
-    <mat-list role="list" style="height: 200px; overflow-y: auto;">
+    <mat-list role="list" style="height: 200px; overflow-y: auto;" #treatedList>
       <mat-option *ngFor="let teacher of filteredTreatedTeachers" (click)="loadUserData(teacher.id)"> {{ teacher.nom }} </mat-option>
     </mat-list>
   </div>

@@ -1,5 +1,13 @@
-<button mat-raised-button style="margin-left: 84%;"
-        (click)="processUpdatingTests()" [disabled]="(selectionTests.length) < 2" color="primary">valider les modifications</button>
+<div class="button-row" style="margin-left: 69%">
+  <button mat-raised-button (click)="processUpdatingTests()"
+          [disabled]="updatedTests.length <= 0">VALIDER</button>
+  <button mat-raised-button color="primary"
+          (click)="executePermute()" [disabled]="(selectionTests.length) !== 2">
+    PERMUTER
+  </button>
+  <button mat-raised-button color="accent">SURVEILLANTS</button>
+</div>
+
 <div class="example-container mat-elevation-z8">
   <div class="example-header">
     <mat-form-field>
@@ -44,23 +52,16 @@
       <mat-cell *matCellDef="let test"> {{test.duree}} </mat-cell>
     </ng-container>
 
-    <ng-container matColumnDef="tests.groupe.classe.nom">
-      <mat-header-cell
-        *matHeaderCellDef class="header-mat-table"
-        [style.color]="sortBy === 'classe' ? 'red' : null"
-        (click)="test('classe')">
-        <strong>CLASSE</strong>
-      </mat-header-cell>
-      <mat-cell *matCellDef="let test"> {{test.groupe.classe.nom}} </mat-cell>
-    </ng-container>
-
     <ng-container matColumnDef="tests.groupe.nom">
-      <mat-header-cell *matHeaderCellDef> <strong>GROUPE</strong> </mat-header-cell>
+      <mat-header-cell *matHeaderCellDef
+                       class="header-mat-table"
+                       [style.color]="sortBy === 'groupe' ? 'red' : null"
+                       (click)="test('groupe')"> <strong>GROUPE</strong> </mat-header-cell>
       <mat-cell *matCellDef="let test"> {{test.groupe.nom}} </mat-cell>
     </ng-container>
     &nbsp;
     <ng-container matColumnDef="tests.groupe.capacite">
-      <mat-header-cell *matHeaderCellDef> <strong>CAPACITE</strong> </mat-header-cell>
+      <mat-header-cell *matHeaderCellDef> <strong>NOMBRE</strong> </mat-header-cell>
       <mat-cell *matCellDef="let test"> &nbsp; {{test.groupe.capacite}} </mat-cell>
     </ng-container>
 
@@ -90,13 +91,8 @@
       <mat-header-cell *matHeaderCellDef> <strong>ETAGE</strong> </mat-header-cell>
       <mat-cell *matCellDef="let test"> {{test.local?.etage}} </mat-cell>
     </ng-container>
+    <!--<button mat-button color="accent" [disabled]="enablePermute(test)" (click)="executePermute()">Permuter</button>-->
 
-    <ng-container matColumnDef="permuter">
-      <mat-header-cell *matHeaderCellDef> </mat-header-cell>
-      <mat-cell *matCellDef="let test">
-        <button mat-button color="accent" [disabled]="enablePermute(test)" (click)="executePermute()">Permuter</button>
-      </mat-cell>
-    </ng-container>
 
 
 

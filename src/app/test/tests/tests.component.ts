@@ -24,9 +24,8 @@ export class TestsComponent implements OnInit {
 
   displayedColumns = [
     'select', 'tests.creneau.date', 'tests.creneau.seance.heureDebut',
-    'tests.nom', 'tests.duree', 'tests.groupe.classe.nom',
-    'tests.groupe.nom', 'tests.groupe.capacite',
-    'tests.local.nom', 'tests.local.capacite', 'tests.local.etage', 'permuter'];
+    'tests.nom', 'tests.duree', 'tests.groupe.nom', 'tests.groupe.capacite',
+    'tests.local.nom', 'tests.local.capacite', 'tests.local.etage'];
   dataSource: MatTableDataSource<Test>;
   locaux: Locale[];
   selectionTests: Test[] = [];
@@ -35,7 +34,7 @@ export class TestsComponent implements OnInit {
   searchLocal = new FormControl();
   newLocalIsSelected = false;
   selection = new SelectionModel<Test>(true, []);
-  sortBy = 'classe';
+  sortBy = 'groupe';
   tests: Test[];
   filteredLocal: Observable<Locale[]>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -68,7 +67,7 @@ export class TestsComponent implements OnInit {
   refresh() {
     this._test.getAllTests().subscribe(test => {
       this.tests = test;
-      this.tests = this.sortBy === 'classe' ? this.tests.sort(sortByClasse) : this.tests.sort(sortByCreneaux);
+      this.tests = this.sortBy === 'groupe' ? this.tests.sort(sortByClasseGroupe) : this.tests.sort(sortByCreneaux);
       this.dataSource = new MatTableDataSource(this.tests);
       this.dataSource.paginator = this.paginator;
       this.changeDetectorRefs.detectChanges();
@@ -149,12 +148,10 @@ export class TestsComponent implements OnInit {
     });
   }
 }
-function sortByClasse(test1: Test, test2: Test) {
-  // console.log(test1.groupe.classe.nom);
-  // console.log(test2.groupe.classe.nom);
-  if (test1.groupe.classe.nom > test2.groupe.classe.nom) {
+function sortByClasseGroupe(test1: Test, test2: Test) {
+  if (test1.groupe.nom > test2.groupe.nom) {
     return 1;
-  } else if (test1.groupe.classe.nom === test2.groupe.classe.nom) {
+  } else if (test1.groupe.nom === test2.groupe.nom) {
     return 0;
   } else {
     return -1;

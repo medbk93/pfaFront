@@ -12,7 +12,7 @@ const routes: Routes = [
   { path: 'tests', children: [
     { path: '', component: TestsComponent},
   ]},
-  { path: '**', redirectTo: 'tests'}
+  { path: '**', redirectTo: 'teachers'}
 ];
 
 @NgModule({
