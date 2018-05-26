@@ -206,11 +206,22 @@ export class TestsComponent implements OnInit {
   }
 
   /** Selects all rows if they are not all selected; otherwise clear selection. */
-  masterToggle() {
+  masterToggle(event) {
+    if (event.checked === true) {
+      this.tests.forEach(test => {
+        // check if the test does not exist
+        this.selectionTests.push(test);
+      });
+    } else {
+      this.selectionTests = [];
+      this.updatedTests = [];
+    }
     this.isAllSelected() ?
       this.selection.clear() :
       this.dataSource.data.forEach(row => this.selection.select(row));
   }
+  clearDataTable() {}
+  selectAllDatatable() {}
 }
 function sortByClasseGroupe(test1: Test, test2: Test) {
   if (test1.groupe.nom > test2.groupe.nom) {
