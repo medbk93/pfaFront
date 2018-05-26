@@ -9,4 +9,7 @@ export class LocalService {
   getAllLocaux(): Observable<Locale[]> {
     return this._http.get<Locale[]>(this._localUrl);
   }
+  getAvailableLocauxForTest(id: number): Observable<Locale[]> {
+    return this._http.get<Locale[]>(this._localUrl + '/available/' + id);
+  }
 }

@@ -1,9 +1,10 @@
 import {
+  AfterViewInit,
   ChangeDetectorRef, Component, OnInit,
   ViewChild
 } from '@angular/core';
 import {
-  MatTableDataSource, MatPaginator, MatCheckbox, MatSnackBar
+  MatTableDataSource, MatPaginator, MatCheckbox, MatSnackBar, MatDialog, MatTooltip, MatCheckboxChange
 } from '@angular/material';
 import {TestService} from './services/test.service';
 import {Test} from './models/test';
@@ -14,6 +15,9 @@ import {startWith} from 'rxjs/operators/startWith';
 import {map} from 'rxjs/operators/map';
 import {Observable} from 'rxjs/Observable';
 import {SelectionModel} from '@angular/cdk/collections';
+import {UpdateSupervisorDialogComponent} from "../supervisor/update-supervisor-dialog/update-supervisor-dialog.component";
+import {TeacherService} from "../availability/services/teacher.service";
+import {Teacher} from "../availability/models/teacher";
 
 @Component({
   selector: 'app-tests',
@@ -27,7 +31,7 @@ export class TestsComponent implements OnInit {
     'tests.nom', 'tests.duree', 'tests.groupe.nom', 'tests.groupe.capacite',
     'tests.local.nom', 'tests.local.capacite', 'tests.local.etage'];
   dataSource: MatTableDataSource<Test>;
-  locaux: Locale[];
+  availableLocaux: Locale[];
   selectionTests: Test[] = [];
   updatedTests: Test[] = [];
   @ViewChild(MatCheckbox) selectedTest: MatCheckbox;
@@ -36,22 +40,15 @@ export class TestsComponent implements OnInit {
   selection = new SelectionModel<Test>(true, []);
   sortBy = 'groupe';
   tests: Test[];
-  filteredLocal: Observable<Locale[]>;
+  cachedTestId: number;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   constructor(private _test: TestService,
               private _local: LocalService,
+              private _teacher: TeacherService,
               private snackBar: MatSnackBar,
+              private dialog: MatDialog,
               private changeDetectorRefs: ChangeDetectorRef) {}
   ngOnInit() {
-    this._local.getAllLocaux().subscribe(local => {
-      this.locaux = local;
-      this.filteredLocal = this.searchLocal.valueChanges
-        .pipe(
-          startWith<string | Locale>(''),
-          map(value => typeof value === 'string' ? value : value.nom),
-          map(name => name ? this.filter(name) : this.locaux.slice())
-        );
-    });
     this.refresh();
   }
   test(sortedBy: string): void {
@@ -73,9 +70,43 @@ export class TestsComponent implements OnInit {
       this.changeDetectorRefs.detectChanges();
     });
   }
+  allTests() {
+    this.dataSource.data = this.tests;
+  }
+
+  testWithoutSupervisor() {
+    console.log(this.tests);
+    this.dataSource.data = this.tests.filter(test => {
+      return test.surveillants.length === 0 || test.surveillants === null;
+    });
+  }
+
+  testWithoutLocal() {
+    this.dataSource.data = this.tests.filter(test => {
+      return test.local === null;
+    });
+    console.log(this.tests);
+  }
+
+  testWithoutSupAndLocal() {
+    this.dataSource.data = this.tests.filter(test => {
+      return test.local === null && (test.surveillants.length === 0 || test.surveillants === null);
+    });
+  }
+
   processUpdatingTests(): void {
     this._test.updateTests(this.updatedTests).subscribe(data => {
+      this.updatedTests = [];
+      console.log(this.updatedTests);
       this.snackBar.open('Les permutations ont bien été procéder', 'succées', {
+        duration: 2000,
+      });
+    });
+  }
+  processUpdateTest(test: Test) {
+    this._test.updateTest(test).subscribe(data => {
+      console.log(data);
+      this.snackBar.open('Epreuve a bien été modifié', 'succées', {
         duration: 2000,
       });
     });
@@ -94,17 +125,11 @@ export class TestsComponent implements OnInit {
       }
     }
   }
-  enablePermute(test: Test): boolean {
-    let disabled = true;
-    if (this.selectionTests.length === 2) {
-      this.selectionTests.find(t => {
-        if (t.id === test.id) {
-          disabled = false;
-          return disabled;
-        }
-      });
-    }
-    return disabled;
+
+  printPDFProcess() {
+    this._test.printPDFProcess(this.selectionTests).subscribe(data => {
+      console.log(data);
+    });
   }
   executePermute() {
     if (this.selectionTests.length === 2) {
@@ -123,11 +148,6 @@ export class TestsComponent implements OnInit {
     test.local.nom = local.nom;
     test.local.capacite = local.capacite;
     test.local.etage = local.etage;
-    // this.clearInput();
-  }
-  filter(filterBy: string): Locale[] {
-    return this.locaux.filter(local =>
-      local.nom.toLowerCase().indexOf(filterBy.toLowerCase()) === 0);
   }
   applyFilter(filterValue: string) {
     const days = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
@@ -146,6 +166,50 @@ export class TestsComponent implements OnInit {
         }
       }
     });
+  }
+
+  getAvailableLocaux(test: Test) {
+    if (this.cachedTestId !== test.id) {
+      this.cachedTestId = test.id;
+      this._local.getAvailableLocauxForTest(test.id).subscribe(local => {
+        this.availableLocaux = local;
+        console.log(this.availableLocaux);
+      });
+    }
+  }
+
+  openUpdateSupervisorDialog() {
+    let teachers: Teacher[];
+    const test: Test = this.selectionTests[0];
+    console.log(test);
+    this._teacher.getAvailableTeacherInThatTest(test.id).subscribe(result => {
+      teachers = result;
+      const dialogRef = this.dialog.open(UpdateSupervisorDialogComponent, {
+        width: '800px',
+        hasBackdrop: false,
+        data: { 'test': test, 'supervisors': teachers}
+      });
+      dialogRef.afterClosed().subscribe(res => {
+        if (res != null) {
+          if (res.test) {
+            this.processUpdateTest(res.test);
+          }
+        }
+      });
+    });
+  }
+  /** Whether the number of selected elements matches the total number of rows. */
+  isAllSelected() {
+    const numSelected = this.selection.selected.length;
+    const numRows = this.dataSource.data.length;
+    return numSelected === numRows;
+  }
+
+  /** Selects all rows if they are not all selected; otherwise clear selection. */
+  masterToggle() {
+    this.isAllSelected() ?
+      this.selection.clear() :
+      this.dataSource.data.forEach(row => this.selection.select(row));
   }
 }
 function sortByClasseGroupe(test1: Test, test2: Test) {
@@ -171,14 +235,3 @@ function sortByCreneaux(test1: Test, test2: Test) {
     return -1; // test1 comes first
   }
 }
-// function compareTo(a, b) {
-//   if ((a.date > b.date) || (a.date === b.date && a.heure < b.heure)) {
-//     return 1; // b comes first
-//   } else if (a.date === b.date &&
-//     (a.heure === b.heure)
-//   ) {
-//     return 0; // leave a and b unchanged
-//   } else {
-//     return -1; // a comes first
-//   }
-// }

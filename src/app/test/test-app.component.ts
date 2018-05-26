@@ -1,9 +1,8 @@
 import {Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
-import {Teacher} from './teachers/models/teacher';
-import {TeacherService} from './teachers/services/teacher.service';
-import {Router} from '@angular/router';
+import {Teacher} from './availability/models/teacher';
+import {TeacherService} from './availability/services/teacher.service';
 import {FormControl} from '@angular/forms';
-import {MatList} from "@angular/material";
+import {MatList} from '@angular/material';
 
 @Component({
   selector: 'app-test-app',
@@ -25,7 +24,6 @@ export class TestAppComponent implements OnInit {
 
   filteredTreatedTeachers: Teacher[];
   filteredNoTreatedTeachers: Teacher[];
-
   _listFilterUntreatedTeacher: string|Teacher;
   _listFilterTreatedTeacher: string|Teacher;
   _teacherType = 'permanent';
@@ -65,6 +63,7 @@ export class TestAppComponent implements OnInit {
 
   ngOnInit() {
     this.teacherService.getPermanentTeachers().subscribe(data => {
+      console.log(data);
       this.permanentTeachers = data;
       this.processPermanentTeacher();
     });
@@ -102,29 +101,58 @@ export class TestAppComponent implements OnInit {
 
   onSavingAvailabilityClicked(teacher: Teacher) {
     if (teacher) {
-      if (teacher.type === 'permanent') {
+      if (teacher.type === 'EPI') {
         const dispo = teacher.creneaux.length * 90;
-        if (dispo >= ((teacher.heures) * 60)) {
-          this.permanentTreatedTeacher.push(teacher);
-          const index = this.permanentUntreatedTeacher.findIndex(t => {
+        if (dispo >= ((teacher.nbrHeure) * 60)) {
+          let index;
+          index = this.permanentTreatedTeacher.findIndex(t => {
             return teacher.id === t.id;
           });
-          // the test already exist, process remove
+          if (index === -1) {
+            this.permanentTreatedTeacher.push(teacher);
+          }
+          console.log(this.permanentTreatedTeacher.length);
+          index = this.permanentUntreatedTeacher.findIndex(t => {
+            return teacher.id === t.id;
+          });
+          console.log(index);
+          // the supervisor already exist, process remove
           if (index !== -1) {
             this.permanentUntreatedTeacher.splice(index, 1);
           }
+        } else {
+          const index = this.permanentTreatedTeacher.findIndex(t => {
+            return teacher.id === t.id;
+          });
+          if (index !== -1) {
+            this.permanentUntreatedTeacher.push(teacher);
+            this.permanentTreatedTeacher.splice(index, 1);
+          }
         }
-      } else if (teacher.type === 'vacataire') {
+      } else if (teacher.type !== 'EPI') {
         if (teacher.creneaux.length > 0) {
-          this.vacataireTreatedTeacher.push(teacher);
-
-          const index = this.vacataireUntreatedTeacher.findIndex(t => {
+          let index;
+          index = this.vacataireTreatedTeacher.findIndex(t => {
+            return teacher.id === t.id;
+          });
+          if (index === -1) {
+            this.vacataireTreatedTeacher.push(teacher);
+          }
+          index = this.vacataireUntreatedTeacher.findIndex(t => {
             return teacher.id === t.id;
           });
           // the test already exist, process remove
           if (index !== -1) {
             this.vacataireUntreatedTeacher.splice(index, 1);
-
+          }
+        } else {
+          const index = this.vacataireTreatedTeacher.findIndex(t => {
+            return teacher.id === t.id;
+          });
+          // the test already exist, process remove
+          if (index !== -1) {
+            this.vacataireUntreatedTeacher.push(teacher);
+            this.vacataireTreatedTeacher.splice(index, 1);
           }
         }
       }
@@ -134,7 +162,7 @@ export class TestAppComponent implements OnInit {
   processPermanentTeacher(): void {
     this.permanentTeachers.forEach(teacher => {
       const dispo = teacher.creneaux.length * 90;
-      if (dispo >= ((teacher.heures) * 60)) {
+      if (dispo >= ((teacher.nbrHeure) * 60)) {
        this.permanentTreatedTeacher.push(teacher);
       } else {
         this.permanentUntreatedTeacher.push(teacher);

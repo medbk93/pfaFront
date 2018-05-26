@@ -1,17 +1,38 @@
-<div class="button-row" style="margin-left: 69%">
+<!--<mat-spinner></mat-spinner> for imprime pdf-->
+<div class="button-row" style="margin-bottom: 2%">
+
   <button mat-raised-button (click)="processUpdatingTests()"
-          [disabled]="updatedTests.length <= 0">VALIDER</button>
+          [disabled]="updatedTests.length === 0">VALIDER</button>
   <button mat-raised-button color="primary"
           (click)="executePermute()" [disabled]="(selectionTests.length) !== 2">
     PERMUTER
   </button>
-  <button mat-raised-button color="accent">SURVEILLANTS</button>
+  <div *ngIf="selectionTests.length !== 1" matTooltip="Veuillez séléctionner une épreuve" style="display: inline-block">
+    <button mat-raised-button color="accent"
+            [disabled]="selectionTests.length !== 1">SURVEILLANTS</button>
+  </div>
+  <button *ngIf="selectionTests.length === 1" mat-raised-button color="accent"
+          (click)="openUpdateSupervisorDialog()"
+          [disabled]="selectionTests.length !== 1">SURVEILLANTS</button>
+  <button mat-raised-button [disabled]="selectionTests.length <= 0" (click)="printPDFProcess()">
+    <mat-icon>print</mat-icon>
+    Imprimer
+  </button>
+
+  <button mat-button [matMenuTriggerFor]="menu">Chercher Epreuve</button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="allTests()">toutes</button>
+    <button mat-menu-item (click)="testWithoutSupervisor()">sans surveillance</button>
+    <button mat-menu-item (click)="testWithoutLocal()">sans salles</button>
+    <button mat-menu-item (click)="testWithoutSupAndLocal()">sans salles et sans surveillances</button>
+  </mat-menu>
 </div>
+<mat-progress-bar *ngIf="!tests" mode="indeterminate"></mat-progress-bar>
 
 <div class="example-container mat-elevation-z8">
   <div class="example-header">
     <mat-form-field>
-      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Chercher Par Epreuve, classe, date...">
+      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Chercher Par epreuve, groupe et date">
     </mat-form-field>
   </div>
   <mat-table #table [dataSource]="dataSource">
@@ -19,10 +40,14 @@
     <!-- Checkbox Column -->
     <ng-container matColumnDef="select">
       <mat-header-cell *matHeaderCellDef>
+        <mat-checkbox (change)="$event ? masterToggle() : null"
+                      [checked]="selection.hasValue() && isAllSelected()"
+                      [indeterminate]="selection.hasValue() && !isAllSelected()">
+        </mat-checkbox>
       </mat-header-cell>
       <mat-cell style="overflow: visible;" *matCellDef="let test">
         <mat-checkbox #SelectedTest (click)="$event.stopPropagation()"
-                      (change)="$event ? pushSelectedTest(test) : null"
+                      (change)="$event ? pushSelectedTest(test, $event) : null"
                       [checked]="selection.isSelected(test)"> </mat-checkbox>
       </mat-cell>
     </ng-container>
@@ -69,12 +94,12 @@
       <mat-header-cell *matHeaderCellDef> <strong>LOCALE</strong> </mat-header-cell>
       <mat-cell *matCellDef="let test">
       <mat-form-field style="width: 75%">
-        <input type="text" placeholder="{{test.local?.nom}}" aria-label="Number"
-               matInput [matAutocomplete]="auto" [value]="test.local?.nom" [formControl]="searchLocal">
+        <input type="text" (click)="getAvailableLocaux(test)" aria-label="Number"
+               matInput [matAutocomplete]="auto" [value]="test.local?.nom">
         <i *ngIf="newLocalIsSelected" class="material-icons clear"
            style="font-size: 12px" matSuffix aria-label="Clear" (click)="clearInput()">clear</i>
         <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
-          <mat-option *ngFor="let local of filteredLocal | async" [value]="local"  (onSelectionChange)="localSelection(test, local)">
+          <mat-option *ngFor="let local of availableLocaux" (onSelectionChange)="localSelection(test, local)">
             {{ local.nom }}
           </mat-option>
         </mat-autocomplete>

@@ -16,6 +16,22 @@ export class TestService {
         'Content-Type':  'application/json'
       })
     };
-    return this._http.put<Test[]>(this._testsUrl + '/update', JSON.stringify(tests), httpOptions);
+    return this._http.put<Test[]>(this._testsUrl + '/all/update', JSON.stringify(tests), httpOptions);
+  }
+  updateTest(test: Test) {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json'
+      })
+    };
+    return this._http.put<Test>(this._testsUrl + '/single/update', JSON.stringify(test), httpOptions);
+  }
+  printPDFProcess(testsToPdf: Test[]): Observable<Test[]> {
+    const httpOptions = {
+      headers: new HttpHeaders({
+        'Content-Type':  'application/json'
+      })
+    };
+    return this._http.post<Test[]>(this._testsUrl + '/pdf', JSON.stringify(testsToPdf), httpOptions);
   }
 }

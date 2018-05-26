@@ -1,0 +1,30 @@
+.example-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.example-container > * {
+  width: 100%;
+}
+.example-full-width {
+  width: 100%;
+}
+
+.example-section {
+  display: flex;
+  align-content: center;
+  align-items: center;
+  height: 60px;
+}
+.example-margin {
+  margin: 0 10px;
+}
+em {
+  float: right;
+  color: #E05C65;
+  padding-left: 10px; }
+.error input {background-color: #E3C3C5}
+.error ::-webkit-input-placeholder { color: #999}
+.error ::-moz-placeholder { color: #999}
+.error :-moz-placeholder { color: #999 }
+.error ::-webkit-input-placeholder { color: #999 }

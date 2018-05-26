@@ -1,0 +1,53 @@
+
+  <p>EPREUVE: <strong>{{ test.nom }}</strong> </p>
+  <p>GROUPE: <strong>{{ test.groupe.nom }}</strong> </p>
+  <p>DATE: <strong>{{ test.creneau.date | date: 'EEEE dd/MMM' }}</strong> </p>
+  <p>DUREE <strong>{{ test.duree * 60 }} minutes </strong></p>
+<mat-dialog-content>
+  <div class="example-container">
+      <mat-list style="height: 25px;" *ngFor="let supervisor of test.surveillants; let i=index"
+                [@supervisor-enter]="state">
+        <div>
+          <mat-list-item style="height: 25px; width: 100%" #element>
+            <h5><strong>{{ supervisor.nom }}</strong></h5>
+            <span class="example-spacer"></span>
+            <button mat-button  matSuffix
+                    mat-icon-button aria-label="Clear" (click)="removeSupervisor(supervisor, i)">
+              <mat-icon>close</mat-icon>
+            </button>
+          </mat-list-item>
+        </div>
+      </mat-list>
+    <div class="done" *ngIf="availableSupervisors.length > 0">
+      <h4 class="availableSupervisorHeader">Surveillants disponibles</h4>
+      <mat-selection-list>
+        <mat-list-option style="height: 25px" [@supervisor-enter]="state"
+                         *ngFor="let supervisor of availableSupervisors; let i=index"
+                         (selectionChange)="pushUserData(supervisor, $event, i)">
+          <div>
+            <strong [style.background-color]=
+                      "supervisor.nbrHeureAffected >= supervisor.nbrHeure
+                  ? 'rgba(244, 67, 54, 0.78)' : 'rgba(0, 128, 0, 0.56)'"> {{ supervisor.nom }} </strong>
+            ayant <strong>{{ supervisor.nbrHeureAffected }} heures déja affécté </strong>
+            et <strong>{{ supervisor.nbrHeure }} heures</strong> de part de surveillance </div>
+        </mat-list-option>
+      </mat-selection-list>
+    </div>
+    <div class="done" *ngIf="availableSupervisors.length <= 0">
+      <h4 class="availableSupervisorHeader">Aucun Surveillants disponibles</h4>
+    </div>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button color="primary" (click)="saveNewSupervisor()">
+    <mat-icon>note_add</mat-icon> Ajouter
+  </button>
+  <button mat-button color="primary" (click)="save()">
+    <mat-icon>save</mat-icon> Sauvegarder
+  </button>
+  <button mat-button color="primary" (click)="dismiss()">
+    <mat-icon>cancel</mat-icon> Annuler
+  </button>
+
+
+</mat-dialog-actions>

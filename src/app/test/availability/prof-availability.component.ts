@@ -28,6 +28,7 @@ export class ProfAvailabilityComponent implements OnInit, OnChanges {
   lengthOfArrayIds = 0;
   enableOrDisableButton = true;
   toggleAllChecked = false;
+  isSaved = false;
   @Output() saveAvailabilityExecuted: EventEmitter<Teacher> = new EventEmitter();
   constructor(private _chreneau: ChreneauService,
               private _teacher: TeacherService,
@@ -35,9 +36,19 @@ export class ProfAvailabilityComponent implements OnInit, OnChanges {
 
 
   ngOnChanges(changes: SimpleChanges): void {
-    this.teacherCrIds = [];
-    this.toggleAllChecked = false;
-    this.ngOnInit();
+    console.log(changes);
+    if (changes.teacher.previousValue === undefined || this.isSaved) {
+        this.teacherCrIds = [];
+        this.toggleAllChecked = false;
+        this.ngOnInit();
+    } else if (changes.teacher.previousValue !== undefined && (changes.teacher.currentValue.id !== changes.teacher.previousValue.id)
+      && !this.isSaved) {
+      if (confirm(`Vous n'avez pas valider vos modifications: ${changes.teacher.previousValue.nom}?`)) {
+        this.teacherCrIds = [];
+        this.toggleAllChecked = false;
+        this.ngOnInit();
+      }
+    }
   }
 
   ngOnInit() {
@@ -55,8 +66,7 @@ export class ProfAvailabilityComponent implements OnInit, OnChanges {
       this.lengthOfArrayIds = this.teacherCrIds.length;
       this.enableOrDisableButton = this.lengthOfArrayIds === 0;
     });
-
-
+    this.isSaved = false;
   }
   // showMatrix() {
   //   for (let i = 0; i < this.chreneaux.length; i++) {
@@ -177,6 +187,7 @@ export class ProfAvailabilityComponent implements OnInit, OnChanges {
     }
 
     this._teacher.saveTeacherAvailability(this.teacher, data).subscribe(teacher => {
+      this.isSaved = true;
       this.snackBar.open('Disponibilté à bien été procéder', 'succées', {
         duration: 2000,
       });
@@ -210,6 +221,9 @@ export class ProfAvailabilityComponent implements OnInit, OnChanges {
             this.toggleAllChecked = true;
           } else {
             this.matrix[i][j] = 0;
+            if (this.teacher != null) {
+              this.insertCreneauxIfExist(this.teacher.creneaux);
+            }
             this.lengthOfArrayIds--;
             this.toggleAllChecked = false;
           }
@@ -220,12 +234,3 @@ export class ProfAvailabilityComponent implements OnInit, OnChanges {
   }
 
 }
-// function sortIds(a: number, b: number) {
-//   if (a < b) {
-//     return 1;
-//   } else if (a === b) {
-//     return 0;
-//   } else {
-//     return -1;
-//   }
-// }

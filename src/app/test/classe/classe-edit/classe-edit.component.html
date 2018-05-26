@@ -1,0 +1,65 @@
+<form #classeForm="ngForm">
+  <h2 mat-dialog-title style="color:#3f51b5;"><strong>Modifier cette classe </strong></h2>
+  <mat-dialog-content>
+    <div class="example-container">
+      <mat-form-field>
+        <em *ngIf="classeForm.controls.nom?.invalid &&
+         (classeForm.controls.nom?.touched || mouseoverclasse)">Requis</em>
+        <input matInput placeholder="Nom de la classe" name="nom" [(ngModel)]="classe.nom" required>
+      </mat-form-field>
+
+      <mat-form-field>
+        <em *ngIf="classeForm.controls.capacite?.invalid &&
+         (classeForm.controls.capacite?.touched || mouseoverclasse)">Requis</em>
+        <input matInput placeholder="Capacité de la classe" name="capacite"
+               [(ngModel)]="classe.capacite" required>
+      </mat-form-field>
+
+      <table class="example-full-width" cellspacing="0"><tr>
+        <td>
+          <em *ngIf="classeForm.controls.nbr?.invalid &&
+         (classeForm.controls.nbr?.touched || mouseoverclasse)">Requis</em>
+          <mat-form-field class="example-full-width">
+            <input matInput placeholder="Nombre des groupes"
+                   name="nbr" [(ngModel)]="classe.nbrGroupe" required>
+          </mat-form-field></td>&nbsp;
+        <td>
+      </tr></table>
+      <section class="example-section">
+        <label class="example-margin">Niveaux:</label>
+        <em *ngIf="classeForm.controls.niveau?.invalid &&
+         (classeForm.controls.niveau?.touched || mouseoverclasse)">Requis</em>
+        <mat-radio-group name="niveau" [(ngModel)]="classe.nivSpecialite.niveau.niveau" required>
+          <mat-radio-button class="example-margin"
+                            *ngFor="let level of levels;" [value]="level.niveau"> Niveau {{level.niveau}}</mat-radio-button>
+        </mat-radio-group>
+      </section>
+
+        <mat-form-field>
+
+          <mat-select name="speciality" placeholder="Choisir une spécialités"
+                      [(ngModel)]="classe.nivSpecialite.specialite.id" required>
+            <mat-select-trigger>{{ classe.nivSpecialite.specialite.nom }}</mat-select-trigger>
+            <mat-option>---</mat-option>
+            <mat-option *ngFor="let speciality of specialities" [value]="speciality.id">
+              {{ speciality.nom }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="classeForm.controls.speciality?.invalid &&
+         (classeForm.controls.spec?.touched || mouseoverclasse)">Veuillez séléctionner une spécialité</mat-error>
+        </mat-form-field>
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <span (mouseenter)="mouseoverclasse=true" (mouseleave)="mouseoverclasse=false">
+      <button mat-button color="primary" [disabled]="classeForm.invalid" (click)="save(classeForm)">
+      <mat-icon>save</mat-icon> Sauvegarder
+    </button>
+    </span>
+    <button mat-button color="primary" (click)="dismiss()">
+      <mat-icon>cancel</mat-icon> Annuler
+    </button>
+  </mat-dialog-actions>
+  </form>
+
+

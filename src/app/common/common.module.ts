@@ -5,6 +5,7 @@ import {FormsModule} from '@angular/forms';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { SidenavComponent } from './sidenav/sidenav.component';
 import { ToolbarComponent } from './toolbar/toolbar.component';
+import { AlertMessageComponent } from './alert-message/alert-message.component';
 
 @NgModule({
   imports: [
@@ -20,6 +21,11 @@ import { ToolbarComponent } from './toolbar/toolbar.component';
     SidenavComponent,
     ToolbarComponent,
   ],
-  declarations: [ SidenavComponent, ToolbarComponent]
+  declarations: [
+    SidenavComponent,
+    ToolbarComponent,
+    AlertMessageComponent
+  ],
+  entryComponents: [AlertMessageComponent]
 })
 export class CommonModule { }

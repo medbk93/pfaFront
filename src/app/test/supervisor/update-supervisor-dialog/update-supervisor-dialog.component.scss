@@ -1,0 +1,28 @@
+.example-container {
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+}
+
+.example-container > * {
+  width: 100%;
+}
+.clear:hover {
+  cursor: pointer;
+  padding: 0 14px;
+}
+.example-spacer {
+  display: flex;
+  flex: 1 1 auto;
+}
+mat-list-item {
+  padding: 15px;
+  background: #f1f1f1;
+  margin-bottom: 2px;
+  font-weight: bold;
+}
+.availableSupervisorHeader {
+  margin-bottom: -1%;
+  margin-top: 10%;
+  color: #3f51b5;
+}

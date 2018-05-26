@@ -1,0 +1,53 @@
+<div class="example-container mat-elevation-z8">
+  <div class="example-header">
+    <mat-form-field>
+      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Chercher Par matiére">
+    </mat-form-field>
+  </div>
+  <mat-table #table [dataSource]="dataSource">
+
+    <!-- Matiere Column -->
+    <ng-container matColumnDef="matiere">
+      <mat-header-cell *matHeaderCellDef> <strong>Matiére</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let subject"> {{subject.nom}} </mat-cell>
+    </ng-container>
+
+    <!-- Departement Column -->
+    <ng-container matColumnDef="departement">
+      <mat-header-cell *matHeaderCellDef> <strong>Departement</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let subject">
+        {{ subject.nivSpecialite.specialite.departement.nom}}
+      </mat-cell>
+    </ng-container>
+
+    <!-- Specialite Column -->
+    <ng-container matColumnDef="specialite">
+      <mat-header-cell *matHeaderCellDef> <strong>Specialité</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let subject"> {{subject.nivSpecialite.specialite.nom}} </mat-cell>
+    </ng-container>
+
+    <!-- Niveau Column -->
+    <ng-container matColumnDef="niveau">
+      <mat-header-cell *matHeaderCellDef> <strong>Niveau</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let subject"> {{subject.nivSpecialite.niveau.niveau}} </mat-cell>
+    </ng-container>
+
+    <!-- Ecole Column -->
+    <ng-container matColumnDef="ecole">
+      <mat-header-cell *matHeaderCellDef> <strong>Ecole</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let subject">
+        {{subject.nivSpecialite.specialite.departement.ecole.nom}}
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+
+  <mat-paginator #paginator
+                 [pageSize]="10"
+                 [pageSizeOptions]="[5, 10, 20]"
+                 [showFirstLastButtons]="true">
+  </mat-paginator>
+</div>
+

@@ -1,0 +1,26 @@
+<mat-card class="dashboard">
+  <h5 style="color: grey">{{title}}</h5>
+  <mat-grid-list cols="3" rowHeight="2:1">
+    <!--<p style="display: inline">title</p>-->
+    <mat-grid-tile>
+
+      <mat-card  [style.background-color]=
+                   "targetSupervisorsCount === targetTreatedSupervisorsCount
+    ? 'rgba(0, 128, 0, 0.56)' : 'rgba(244, 67, 54, 0.78)'">
+        Total: {{targetSupervisorsCount}}
+      </mat-card>
+    </mat-grid-tile>
+    <mat-grid-tile>
+      <mat-card>
+        Traité: {{targetTreatedSupervisorsCount}}
+      </mat-card>
+    </mat-grid-tile>
+    <mat-grid-tile>
+      <mat-card [style.background-color]="
+      targetUntreatedSupervisorsCount != 0 ? 'rgba(251, 199, 8, 0.67)' : 'rgba(251, 199, 8, 0)'">
+        Non Traité: {{targetUntreatedSupervisorsCount}}
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list>
+</mat-card>
+

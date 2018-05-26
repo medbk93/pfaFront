@@ -5,12 +5,25 @@
     <mat-toolbar class="sidenav" color="primary">
       Informations
     </mat-toolbar>
-    <mat-list role="list">
-      <mat-list-item role="listitem">Disponibilté</mat-list-item>
-      <mat-list-item role="listitem">Epreuves</mat-list-item>
-    </mat-list>
-
+    <mat-nav-list>
+      <mat-list-item>
+        <strong><a matLine routerLink="/teachers">Disponibilté</a></strong>
+      </mat-list-item>
+      <mat-list-item>
+        <a matLine routerLink="/tests">Epreuves</a>
+      </mat-list-item>
+      <mat-list-item>
+        <a matLine routerLink="/supervisors">Surveillants</a>
+      </mat-list-item>
+      <mat-list-item>
+        <a matLine routerLink="/subjects">Matiére</a>
+      </mat-list-item>
+      <mat-list-item>
+        <a matLine routerLink="/classes">Classes</a>
+      </mat-list-item>
+    </mat-nav-list>
   </mat-sidenav>
+
 
   <div class="app-sidenav-content">
     <app-toolbar (toggleSidenav)="sidenav.toggle()"></app-toolbar>

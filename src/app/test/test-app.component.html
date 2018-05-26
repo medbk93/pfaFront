@@ -1,35 +1,19 @@
 <!--make dashboar a child component reusable-->
 <div>
-  <mat-card class="dashboard">
-    <h5 style="color: grey">Surveillants Permanents</h5>
-    <mat-grid-list cols="3" rowHeight="2:1">
-      <!--<p style="display: inline">title</p>-->
-      <mat-grid-tile>
+  <app-dashboard [title]="'Surveillants Permanents'"
+                 [targetSupervisorsCount]="permanentTeachers?.length"
+                 [targetTreatedSupervisorsCount]="permanentTreatedTeacher?.length"
+                 [targetUntreatedSupervisorsCount] ="permanentUntreatedTeacher?.length">
 
-        <mat-card [style.background-color]=
-                    "permanentTeachers?.length === permanentTreatedTeacher?.length
-                        ? 'green' : 'rgba(244, 67, 54, 0.78)'">
-          Total: {{permanentTeachers?.length}}</mat-card>
-      </mat-grid-tile>
-      <mat-grid-tile><mat-card>Traité: {{permanentTreatedTeacher?.length}}</mat-card></mat-grid-tile>
-      <mat-grid-tile><mat-card>Non Traité: {{permanentUntreatedTeacher?.length}}</mat-card></mat-grid-tile>
-    </mat-grid-list>
-  </mat-card>
+  </app-dashboard>
 </div>
 <div>
-  <mat-card class="dashboard">
-    <h5 style="color: grey">Surveillants Vacataire</h5>
-    <mat-grid-list cols="3" rowHeight="2:1">
-      <!--<p style="display: inline">title</p>-->
-      <mat-grid-tile>
-        <mat-card [style.background-color]="vacataireTeachers?.length
-        === vacataireTreatedTeacher?.length ? 'green' : 'rgba(244, 67, 54, 0.78)'">
-          Total: {{vacataireTeachers?.length}}</mat-card>
-      </mat-grid-tile>
-      <mat-grid-tile><mat-card>Traité: {{ vacataireTreatedTeacher?.length }}</mat-card></mat-grid-tile>
-      <mat-grid-tile><mat-card>Non Traité: {{ vacataireUntreatedTeacher?.length }}</mat-card></mat-grid-tile>
-    </mat-grid-list>
-  </mat-card>
+  <app-dashboard [title]="'Surveillants Vacataires'"
+                 [targetSupervisorsCount]="vacataireTeachers?.length"
+                 [targetTreatedSupervisorsCount]="vacataireTreatedTeacher?.length"
+                 [targetUntreatedSupervisorsCount] ="vacataireUntreatedTeacher?.length">
+
+  </app-dashboard>
 </div>
 <div class="clearfix"></div>
 <form class="teacher-form">

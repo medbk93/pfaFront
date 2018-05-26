@@ -1,0 +1,78 @@
+<div class="button-row">
+  <button mat-raised-button color="primary" (click)="addClasse()">
+    <i class="material-icons">
+      note_add
+    </i>
+    Ajouter</button>
+
+</div>
+
+<div class="example-container mat-elevation-z8">
+  <div class="example-header">
+    <mat-form-field>
+      <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Chercher  classe">
+    </mat-form-field>
+  </div>
+  <mat-table #table [dataSource]="dataSource">
+
+    <!-- classe Column -->
+    <ng-container matColumnDef="classe">
+      <mat-header-cell *matHeaderCellDef> <strong>Classe</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let classe"> {{classe.nom}} </mat-cell>
+    </ng-container>
+
+    <!-- capacité Column -->
+    <ng-container matColumnDef="capacite">
+      <mat-header-cell *matHeaderCellDef> <strong>Capacité</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let classe">
+        {{ classe.capacite }}
+      </mat-cell>
+    </ng-container>
+
+    <!-- nbGroupe Column -->
+    <ng-container matColumnDef="nbGroupe">
+      <mat-header-cell *matHeaderCellDef> <strong>Nb Groupe</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let classe"> {{ classe.nbrGroupe}}  </mat-cell>
+    </ng-container>
+
+    <!-- Niveau Column -->
+    <ng-container matColumnDef="niveau">
+      <mat-header-cell *matHeaderCellDef> <strong>Niveau</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let classe"> {{ classe.nivSpecialite.niveau.niveau}}  </mat-cell>
+    </ng-container>
+
+    <!-- Specialite Column -->
+    <ng-container matColumnDef="specialite">
+      <mat-header-cell *matHeaderCellDef> <strong>Specialité</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let classe">
+        {{ classe.nivSpecialite.specialite.nom }}
+      </mat-cell>
+    </ng-container>
+    <!-- Departement Column -->
+    <ng-container matColumnDef="departement">
+      <mat-header-cell *matHeaderCellDef> <strong>Departement</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let classe">
+        {{ classe.nivSpecialite.specialite.departement.nom }}
+      </mat-cell>
+    </ng-container>
+
+    <!-- Action Column -->
+    <ng-container matColumnDef="actions">
+      <mat-header-cell *matHeaderCellDef> <strong>Actions</strong> </mat-header-cell>
+      <mat-cell *matCellDef="let classe">
+        <mat-icon style="color: rgba(48, 79, 254, 0.78); cursor: pointer" (click)="editClasse(classe)">edit</mat-icon>
+        <mat-icon (click)="deleteClasse(classe)" style="color: #E91E63; cursor: pointer">delete_forever</mat-icon>
+      </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+
+  <mat-paginator #paginator
+                 [pageSize]="10"
+                 [pageSizeOptions]="[5, 10, 20]"
+                 [showFirstLastButtons]="true">
+  </mat-paginator>
+</div>
+
