@@ -59,7 +59,7 @@
         (click)="test('creneau')">
         <strong>DATE</strong>
       </mat-header-cell>
-      <mat-cell *matCellDef="let test"> {{test.creneau.date | date: 'EEEE'}} </mat-cell>
+      <mat-cell *matCellDef="let test"> {{test.creneau.date | date: 'EEE dd/MMM'}} </mat-cell>
     </ng-container>
     <ng-container matColumnDef="tests.creneau.seance.heureDebut">
       <mat-header-cell *matHeaderCellDef> <strong>HEURE DEBUT</strong> </mat-header-cell>
@@ -100,7 +100,7 @@
            style="font-size: 12px" matSuffix aria-label="Clear" (click)="clearInput()">clear</i>
         <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayFn">
           <mat-option *ngFor="let local of availableLocaux" (onSelectionChange)="localSelection(test, local)">
-            {{ local.nom }}
+            <p *ngIf="local">{{ local.nom }} : {{ local.capacite }}</p>
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>

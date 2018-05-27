@@ -18,6 +18,7 @@ import {SelectionModel} from '@angular/cdk/collections';
 import {UpdateSupervisorDialogComponent} from "../supervisor/update-supervisor-dialog/update-supervisor-dialog.component";
 import {TeacherService} from "../availability/services/teacher.service";
 import {Teacher} from "../availability/models/teacher";
+import {Local} from "protractor/built/driverProviders";
 
 @Component({
   selector: 'app-tests',
@@ -41,6 +42,7 @@ export class TestsComponent implements OnInit {
   sortBy = 'groupe';
   tests: Test[];
   cachedTestId: number;
+  filteredTests: Test[] = [];
   @ViewChild(MatPaginator) paginator: MatPaginator;
   constructor(private _test: TestService,
               private _local: LocalService,
@@ -64,41 +66,45 @@ export class TestsComponent implements OnInit {
   refresh() {
     this._test.getAllTests().subscribe(test => {
       this.tests = test;
+      this.filteredTests = this.tests;
       this.tests = this.sortBy === 'groupe' ? this.tests.sort(sortByClasseGroupe) : this.tests.sort(sortByCreneaux);
       this.dataSource = new MatTableDataSource(this.tests);
       this.dataSource.paginator = this.paginator;
-      this.changeDetectorRefs.detectChanges();
+      // this.changeDetectorRefs.detectChanges();
     });
   }
   allTests() {
     this.dataSource.data = this.tests;
+    this.filteredTests = this.tests;
   }
 
   testWithoutSupervisor() {
     console.log(this.tests);
-    this.dataSource.data = this.tests.filter(test => {
+    this.filteredTests = this.tests.filter(test => {
       return test.surveillants.length === 0 || test.surveillants === null;
     });
+    this.dataSource.data = this.filteredTests;
   }
 
   testWithoutLocal() {
-    this.dataSource.data = this.tests.filter(test => {
+    this.filteredTests = this.tests.filter(test => {
       return test.local === null;
     });
-    console.log(this.tests);
+    this.dataSource.data = this.filteredTests;
   }
 
   testWithoutSupAndLocal() {
-    this.dataSource.data = this.tests.filter(test => {
+    this.filteredTests = this.tests.filter(test => {
       return test.local === null && (test.surveillants.length === 0 || test.surveillants === null);
     });
+    this.dataSource.data = this.filteredTests;
   }
 
   processUpdatingTests(): void {
     this._test.updateTests(this.updatedTests).subscribe(data => {
       this.updatedTests = [];
       console.log(this.updatedTests);
-      this.snackBar.open('Les permutations ont bien été procéder', 'succées', {
+      this.snackBar.open('Les modifications ont bien été procéder', 'succées', {
         duration: 2000,
       });
     });
@@ -128,7 +134,9 @@ export class TestsComponent implements OnInit {
 
   printPDFProcess() {
     this._test.printPDFProcess(this.selectionTests).subscribe(data => {
-      console.log(data);
+      this.snackBar.open('le ou les épreuves sélectionnées ont bien été généré', 'succées', {
+        duration: 2000,
+      });
     });
   }
   executePermute() {
@@ -144,20 +152,41 @@ export class TestsComponent implements OnInit {
     this.selection = new SelectionModel<Test>(true, []);
   }
   localSelection(test: Test, local: Locale) {
+    let index;
+    const testLocal = Object.assign({}, test.local);
+    index = this.availableLocaux.findIndex(l => {
+      return l.id === local.id;
+    });
+    if (index !== -1) {
+      this.availableLocaux.splice(index, 1);
+    }
+    this.availableLocaux.forEach(lo => console.log(lo));
+    this.availableLocaux.push(testLocal);
     this.newLocalIsSelected = true;
-    test.local.nom = local.nom;
-    test.local.capacite = local.capacite;
-    test.local.etage = local.etage;
+    test.local = local;
+    // add the updated test to updatedTest array
+    index = this.updatedTests.findIndex(t => {
+      return t.id === test.id;
+    });
+    if (index !== -1) {
+      // test exist, process remove and add the new test
+      this.updatedTests.splice(index, 1);
+      this.updatedTests.push(test);
+    } else {
+      // test does not exist
+      this.updatedTests.push(test);
+    }
+    console.log(this.updatedTests);
   }
   applyFilter(filterValue: string) {
     const days = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi'];
     filterValue = filterValue.trim(); // Remove whitespace
     filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
     // this.dataSource.filter;
-    this.dataSource.data = this.tests.filter(t => {
+    this.dataSource.data = this.filteredTests.filter(t => {
       if (t.nom.toLocaleLowerCase().trim().indexOf(filterValue) !== -1) {
         return true;
-      } else if (t.groupe.classe.nom.toLocaleLowerCase().trim().indexOf(filterValue) !== -1) {
+      } else if (t.groupe.nom.toLocaleLowerCase().trim().indexOf(filterValue) !== -1) {
         return true;
       } else if (days[new Date(t.creneau.date).getDay()]) {
         // getDate() return the number of the days for exp monday ==> 0
@@ -173,7 +202,6 @@ export class TestsComponent implements OnInit {
       this.cachedTestId = test.id;
       this._local.getAvailableLocauxForTest(test.id).subscribe(local => {
         this.availableLocaux = local;
-        console.log(this.availableLocaux);
       });
     }
   }
@@ -186,7 +214,7 @@ export class TestsComponent implements OnInit {
       teachers = result;
       const dialogRef = this.dialog.open(UpdateSupervisorDialogComponent, {
         width: '800px',
-        hasBackdrop: false,
+        hasBackdrop: true,
         data: { 'test': test, 'supervisors': teachers}
       });
       dialogRef.afterClosed().subscribe(res => {
@@ -212,16 +240,15 @@ export class TestsComponent implements OnInit {
         // check if the test does not exist
         this.selectionTests.push(test);
       });
+      this.dataSource.data.forEach(row => this.selection.select(row));
     } else {
       this.selectionTests = [];
       this.updatedTests = [];
+      this.selection.clear();
     }
-    this.isAllSelected() ?
-      this.selection.clear() :
-      this.dataSource.data.forEach(row => this.selection.select(row));
   }
   clearDataTable() {}
-  selectAllDatatable() {}
+  selectAndPushDatatable() {}
 }
 function sortByClasseGroupe(test1: Test, test2: Test) {
   if (test1.groupe.nom > test2.groupe.nom) {

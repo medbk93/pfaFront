@@ -39,7 +39,7 @@
   </div>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button color="primary" (click)="saveNewSupervisor()">
+  <button mat-button color="primary" [disabled]="supervisors.length === 0" (click)="saveNewSupervisor()">
     <mat-icon>note_add</mat-icon> Ajouter
   </button>
   <button mat-button color="primary" (click)="save()">

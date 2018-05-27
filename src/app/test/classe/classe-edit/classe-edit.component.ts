@@ -54,10 +54,10 @@ export class ClasseEditComponent implements OnInit {
     console.log(classValue);
     // Copy the form values over the product object values
     const levelId = this.classe.nivSpecialite.niveau.niveau;
-    const specId = this.classe.nivSpecialite.specialite.id;
-    console.log('level id', levelId);
-    console.log('specId', specId);
-    this._classe.getLevelSpecialityId(specId, levelId).subscribe(nivSpec => {
+    const specName = this.classe.nivSpecialite.specialite.nom;
+    // this.specialities.
+    console.log(specName);
+    this._classe.getLevelSpecialityId(specName, levelId).subscribe(nivSpec => {
       console.log(nivSpec);
       if (nivSpec.id === null) {
         const data = {

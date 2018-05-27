@@ -47,19 +47,16 @@ export class UpdateSupervisorDialogComponent implements OnInit {
     if (supervisorAffectedNumber === 0) {
       data = {
         title: 'Surveillances',
-        body:  'epreuve sans surveillance',
+        body:  'epreuve ne peut pas étre sans aucun surveillants',
         type: '#ff0000'
       };
       const dialogRef = this.openDialog(data);
-      dialogRef.afterClosed().subscribe(res => {
-        console.log(res.flag);
-        this.dialogRef.close({test: this.test});
-      });
+      dialogRef.afterClosed().subscribe(res => {});
     } else if (supervisorAffectedNumber < expectedSupervisorNumber) {
        data = {
         title: 'Surveillances',
-        body: 'surveillance inférieur à la surveillance requise' +
-        '        , Epreuve nécéssite' + expectedSupervisorNumber,
+        body: 'Le nombre de surveillant est inférieur au nombre requis' +
+        '        , Epreuve nécéssite' + expectedSupervisorNumber + ' surveillants',
         type: '#ff7600'
       };
       const dialogRef = this.openDialog(data);
@@ -79,7 +76,7 @@ export class UpdateSupervisorDialogComponent implements OnInit {
   }
   openDialog(data: any) {
     return this.dialog.open(AlertMessageComponent, {
-      width: '250px',
+      width: '300px',
       data: { data },
       hasBackdrop: false,
     });
@@ -98,7 +95,9 @@ export class UpdateSupervisorDialogComponent implements OnInit {
       const index = this.supervisors.findIndex(sup => {
         return sup === supervisor;
       });
-      this.supervisors.splice(index, 1);
+      if (index !== -1) {
+        this.supervisors.splice(index, 1);
+      }
     }
   }
 
@@ -107,10 +106,8 @@ export class UpdateSupervisorDialogComponent implements OnInit {
       const supervisorAffectedNumber = this.test.surveillants.length + this.supervisors.length;
       const expectedSupervisorNumber = Math.round(this.test.groupe.capacite / 15);
       if (supervisorAffectedNumber > expectedSupervisorNumber) {
-        // pass to openDialog the right header
-        // in this call pass: ""
         const data = { title: 'Surveillances',
-          body: 'surveillance suppérieur à la surveillance requise',
+          body: 'Le nombre de surveillants est suppérieur au nombre requis',
           type: '#ff7600'
         };
         const dialogRef = this.openDialog(data);

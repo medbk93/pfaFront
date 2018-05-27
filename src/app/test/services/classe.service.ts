@@ -24,8 +24,8 @@ export class ClasseService {
         catchError(this.handleError)
       );
   }
-  getLevelSpecialityId(specId: number, levelId: number): Observable<LevelSpeciality> {
-    return this._http.get<LevelSpeciality>(`${this._baseClass}/speciality/${specId}/niveau/${levelId}`).map(result => {
+  getLevelSpecialityId(specName: string, levelId: number): Observable<LevelSpeciality> {
+    return this._http.get<LevelSpeciality>(`${this._baseClass}/speciality/${specName}/niveau/${levelId}`).map(result => {
       return result;
     });
   }

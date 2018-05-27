@@ -35,7 +35,7 @@ export class ClasseComponent implements OnInit {
     this.classe = new Classe();
     const dialogRef = this.dialog.open(ClasseEditComponent, {
       width: '750px',
-      hasBackdrop: false,
+      hasBackdrop: true,
       data: { flag: 0 }
     });
     dialogRef.afterClosed().subscribe(res => {
@@ -56,7 +56,7 @@ export class ClasseComponent implements OnInit {
   deleteClasse(classe: Classe) {
     console.log(classe);
     if (classe.id) {
-      if (confirm(`Really delete the product: ${classe.nom}?`)) {
+      if (confirm(`Vous etes sur de vouloir supprimer la classe: ${classe.nom}?`)) {
         this._classe.deleteClasse(classe.id)
           .subscribe(result => {
             console.log('result', result);
@@ -68,6 +68,14 @@ export class ClasseComponent implements OnInit {
     }
   }
   applyFilter(filter: string) {
-    console.log(filter);
+    filter = filter.trim(); // Remove whitespace
+    filter = filter.toLowerCase(); // MatTableDataSource defaults to lowercase matches
+    this.dataSource.data = this.classes.filter(classe => {
+      if (classe.nom.toLocaleLowerCase().trim().indexOf(filter) !== -1) {
+        return true;
+      } else if (classe.nivSpecialite.specialite.nom.toLocaleLowerCase().trim().indexOf(filter) !== -1) {
+        return true;
+      }
+    });
   }
 }
